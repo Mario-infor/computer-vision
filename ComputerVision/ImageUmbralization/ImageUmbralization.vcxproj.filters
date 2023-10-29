@@ -15,16 +15,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FinalProject.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="WithSolvePnP.cpp">
+    <ClCompile Include="ImageUmbralization.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Media Include="Video\Chessboard.mp4">
+    <Image Include="Img\Jaguar1.png">
       <Filter>Archivos de recursos</Filter>
-    </Media>
+    </Image>
+    <Image Include="Img\Jaguar1R.png">
+      <Filter>Archivos de recursos</Filter>
+    </Image>
+    <Image Include="Img\Jaguar2.jpg">
+      <Filter>Archivos de recursos</Filter>
+    </Image>
+    <Image Include="Img\Jaguar2.png">
+      <Filter>Archivos de recursos</Filter>
+    </Image>
   </ItemGroup>
 </Project>

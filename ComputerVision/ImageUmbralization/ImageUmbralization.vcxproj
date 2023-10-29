@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{f2fa2caa-58b3-4502-b354-7e5cf03346d4}</ProjectGuid>
-    <RootNamespace>FinalProject</RootNamespace>
+    <ProjectGuid>{d0b016da-99ed-4627-a5ba-223b949e90f9}</ProjectGuid>
+    <RootNamespace>ImageUmbralization</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -137,11 +137,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="WithSolvePnP.cpp" />
-    <ClCompile Include="FinalProject.cpp" />
+    <ClCompile Include="ImageUmbralization.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Media Include="Video\Chessboard.mp4" />
+    <Image Include="Img\Jaguar1.png" />
+    <Image Include="Img\Jaguar1R.png" />
+    <Image Include="Img\Jaguar2.jpg" />
+    <Image Include="Img\Jaguar2.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
