@@ -236,7 +236,7 @@ int main()
 	vector<int> tempNewTags;
 	vector<Mat> imgList;
 	vector<Mat> listMatClasses;
-	frame = imread("Img/Jaguar2.png", 1);
+	frame = imread("Img/Jaguar1R.png", 1);
 
 	frame.convertTo(fFrame, CV_32FC3);
 	fFrame /= 255;

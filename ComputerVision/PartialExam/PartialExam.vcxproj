@@ -136,7 +136,17 @@
     <ClCompile Include="PartialExam.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Img\Jaguar2.png" />
+    <None Include="Doc\Partial-Exam-Doc.docx" />
+    <None Include="Doc\Partial-Exam-Doc.pdf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Img\ImgEjemplo1R.png" />
+    <Image Include="Img\ImgEjemplo2R.png" />
+    <Image Include="Img\ImgEjemplo3R.png" />
+    <Image Include="Img\ImgEjemplo4R.png" />
+    <Image Include="Img\ImgEjemplo5R.png" />
+    <Image Include="Img\ImgEjemplo6R.png" />
+    <Image Include="Img\Jaguar1R.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

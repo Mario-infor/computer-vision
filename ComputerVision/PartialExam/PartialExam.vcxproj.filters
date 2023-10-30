@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Archivos de recursos\Docs">
+      <UniqueIdentifier>{f113e367-8a44-442e-97a1-d7c8dfb556f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de recursos\Img">
+      <UniqueIdentifier>{729c801f-8ea3-4ecd-92df-21f9af51682a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PartialExam.cpp">
@@ -20,8 +26,34 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Img\Jaguar2.png">
-      <Filter>Archivos de recursos</Filter>
+    <None Include="Doc\Partial-Exam-Doc.docx">
+      <Filter>Archivos de recursos\Docs</Filter>
+    </None>
+    <None Include="Doc\Partial-Exam-Doc.pdf">
+      <Filter>Archivos de recursos\Docs</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Img\ImgEjemplo1R.png">
+      <Filter>Archivos de recursos\Img</Filter>
+    </Image>
+    <Image Include="Img\ImgEjemplo2R.png">
+      <Filter>Archivos de recursos\Img</Filter>
+    </Image>
+    <Image Include="Img\ImgEjemplo3R.png">
+      <Filter>Archivos de recursos\Img</Filter>
+    </Image>
+    <Image Include="Img\ImgEjemplo4R.png">
+      <Filter>Archivos de recursos\Img</Filter>
+    </Image>
+    <Image Include="Img\ImgEjemplo5R.png">
+      <Filter>Archivos de recursos\Img</Filter>
+    </Image>
+    <Image Include="Img\ImgEjemplo6R.png">
+      <Filter>Archivos de recursos\Img</Filter>
+    </Image>
+    <Image Include="Img\Jaguar1R.png">
+      <Filter>Archivos de recursos\Img</Filter>
     </Image>
   </ItemGroup>
 </Project>
