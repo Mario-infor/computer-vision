@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{c79a5297-6924-4cf8-a2ff-e64c0dce1192}</ProjectGuid>
-    <RootNamespace>MatlabToC</RootNamespace>
+    <ProjectGuid>{257b290e-8530-466d-abcd-ce358dbc8d02}</ProjectGuid>
+    <RootNamespace>PartialExam</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -133,7 +133,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="MatlabToC++.cpp" />
+    <ClCompile Include="PartialExam.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Img\Jaguar2.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
