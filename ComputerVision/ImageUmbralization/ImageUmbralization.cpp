@@ -43,7 +43,6 @@ void umbral(float miuOne, float miuTwo, float desvOne, float desvTwo, float& x1,
 
 	x1 = (-b + sqrt(d)) / (2 * a);
 	x2 = (-b - sqrt(d)) / (2 * a);
-
 }
 
 int main() {
@@ -61,6 +60,7 @@ int main() {
 
 	float x1, x2 = -1;
 	umbral(30, 20, 4, 5, x1, x2);
+
 	std::cout << "x1 = " << x1 << '\n';
 	std::cout << "x2 = " << x2 << '\n';
 
