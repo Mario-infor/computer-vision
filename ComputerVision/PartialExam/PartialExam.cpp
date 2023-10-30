@@ -9,6 +9,7 @@
 using namespace std;
 using namespace cv;
 
+// Auxiliary class to store the classes in which each pixel can be classified.
 class Class
 {
 private:
@@ -72,6 +73,7 @@ public:
 	}
 };
 
+// Calculate Mahalanobis distance.
 double dMahalanobisN(double a, double b, double am, double bm, double s1,
 	double s2, double s3)
 {
@@ -92,6 +94,7 @@ double dMahalanobisN(double a, double b, double am, double bm, double s1,
 	return D;
 }
 
+// Calculate Euclidean distance.
 double dEuclidean(double a, double b, double am, double bm, double s1,
 	double s2, double s3)
 {
@@ -108,6 +111,7 @@ double dEuclidean(double a, double b, double am, double bm, double s1,
 	D = da * da + db * db;
 	return D;
 }
+
 
 int MeanCov(Mat& image, Mat& Mask, Mat& mean, Mat& cov)
 {
