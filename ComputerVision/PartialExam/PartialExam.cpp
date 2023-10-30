@@ -112,7 +112,7 @@ double dEuclidean(double a, double b, double am, double bm, double s1,
 	return D;
 }
 
-
+// Calculate mean and covariance of an image.
 int MeanCov(Mat& image, Mat& Mask, Mat& mean, Mat& cov)
 {
 	float m[2], pm[2], Cv[3], icont;
@@ -176,6 +176,7 @@ int MeanCov(Mat& image, Mat& Mask, Mat& mean, Mat& cov)
 	return cont;
 }
 
+// Check if a class will endure to the next level of the cascade.
 bool classEndures(Mat classes, int findTag)
 {
 	for (int i = 0; i < classes.rows; i++)
@@ -191,6 +192,7 @@ bool classEndures(Mat classes, int findTag)
 	return false;
 }
 
+// Count the amount of classes on every position of the classesMatrix and store it at classesList.
 void countClasses(vector<Class>& classesList, Mat classesMatrix)
 {
 	for (size_t i = 0; i < classesMatrix.rows; i++)
@@ -254,7 +256,7 @@ int main()
 	tagId += 1;
 	newTags.push_back(tagId);
 
-	/*******************************************************************************************/
+	// Loop that will keep going as long as new classes are generated.
 	while (newTags.size() > 0 && !finish)
 	{
 		currentTags.clear();
@@ -263,6 +265,7 @@ int main()
 		currentTags.push_back(newTags.front());
 		newTags.erase(newTags.begin());
 
+		// Loop that updates the mask to work only with correspinding pixels on the image.
 		mMask = Mat::zeros(fFrame.size(), CV_8UC1);
 		for (int i = 0; i < classes.rows; i++)
 		{
@@ -274,6 +277,8 @@ int main()
 				}
 			}
 		}
+
+		// Check if pixels corresponding to current class 1 have covariance different to cero. 
 		MeanCov(labFrame, mMask, Mean, Cov);
 		if (countNonZero(Cov) < 1)
 		{
@@ -286,7 +291,7 @@ int main()
 		listClasses.push_back(clase1);
 		listClassesEndures.push_back(clase1);
 
-
+		// Loop that updates the mask to work only with correspinding pixels on the image.
 		mMask = Mat::zeros(fFrame.size(), CV_8UC1);
 		for (int i = 0; i < classes.rows; i++)
 		{
@@ -298,6 +303,8 @@ int main()
 				}
 			}
 		}
+
+		// Check if pixels corresponding to current class 2 have covariance different to cero. 
 		MeanCov(labFrame, mMask, Mean, Cov);
 		if (countNonZero(Cov) < 1)
 		{
@@ -310,6 +317,7 @@ int main()
 		listClasses.push_back(clase2);
 		listClassesEndures.push_back(clase2);
 
+		// Loop that updates to which class belongs every pixel of interest.
 		bool changes = false;
 		while (!changes && !covClass1AllCero && !covClasss2AllCero)
 		{
@@ -317,8 +325,10 @@ int main()
 			{
 				for (int j = 0; j < labFrame.cols; j++)
 				{
+					// Check if the pixel of interest belongs to class 1 or class 2.
 					if (classes.at<uchar>(i, j) == clase1.GetTag() || classes.at<uchar>(i, j) == clase2.GetTag())
 					{
+						// Calculate euclidean distance from the pixel to the classes to compare later on.
 						double d1 = dEuclidean(labFrame.at<Vec3f>(i, j)[1], labFrame.at<Vec3f>(i, j)[2],
 							clase1.GetMean().at<float>(0, 0), clase1.GetMean().at<float>(1, 0),
 							clase1.GetCov().at<float>(0, 0), clase1.GetCov().at<float>(1, 1), clase1.GetCov().at<float>(0, 1));
@@ -327,6 +337,7 @@ int main()
 							clase2.GetMean().at<float>(0, 0), clase2.GetMean().at<float>(1, 0),
 							clase2.GetCov().at<float>(0, 0), clase2.GetCov().at<float>(1, 1), clase2.GetCov().at<float>(0, 1));
 
+						// If the pixel is closer to calss 1 it belongs to it, if not it belongs to class 2.
 						if (d1 <= d2)
 						{
 							if (classes.at<uchar>(i, j) != clase1.GetTag())
@@ -348,8 +359,10 @@ int main()
 				}
 			}
 
+			// Check if a pixel changed class.
 			if (changes)
 			{
+				// Loop that updates the mask to work only with correspinding pixels on the image.
 				mMask = Mat::zeros(fFrame.size(), CV_8UC1);
 				for (int i = 0; i < classes.rows; i++)
 				{
@@ -361,13 +374,15 @@ int main()
 						}
 					}
 				}
+
+				// Check if pixels corresponding to current class 1 have covariance different to cero.
 				MeanCov(labFrame, mMask, Mean, Cov);
 				if (countNonZero(Cov) < 1)
 				{
 					covClass1AllCero = true;
 					if (countNonZero(Mean) < 1)
 					{
-						std::cout << "detener" << endl << endl;
+						std::cout << "stop!" << endl << endl;
 					}
 				}
 				std::cout << Mean << endl << endl;
@@ -375,6 +390,7 @@ int main()
 				clase1.SetMean(Mean.clone());
 				clase1.SetCov(Cov.clone());
 
+				// Loop that updates the mask to work only with correspinding pixels on the image.
 				mMask = Mat::zeros(fFrame.size(), CV_8UC1);
 				for (int i = 0; i < classes.rows; i++)
 				{
@@ -386,6 +402,8 @@ int main()
 						}
 					}
 				}
+
+				// Check if pixels corresponding to current class 2 have covariance different to cero.
 				MeanCov(labFrame, mMask, Mean, Cov);
 				if (countNonZero(Cov) < 1)
 				{
@@ -407,6 +425,8 @@ int main()
 			}
 		}
 
+		// When there is no more change on classes with the euclidean distance the move to do the same process with
+		// Mahalanobis distances.
 		changes = false;
 		while (!changes && !covClass1AllCero && !covClasss2AllCero)
 		{
@@ -414,8 +434,10 @@ int main()
 			{
 				for (int j = 0; j < labFrame.cols; j++)
 				{
+					// Check if the pixel of interest belongs to class 1 or class 2.
 					if (classes.at<uchar>(i, j) == clase1.GetTag() || classes.at<uchar>(i, j) == clase2.GetTag())
 					{
+						// Calculate Mahalanobis distance from the pixel to the classes to compare later on.
 						double d1 = dMahalanobisN(labFrame.at<Vec3f>(i, j)[1], labFrame.at<Vec3f>(i, j)[2],
 							clase1.GetMean().at<float>(0, 0), clase1.GetMean().at<float>(1, 0),
 							clase1.GetCov().at<float>(0, 0), clase1.GetCov().at<float>(1, 1), clase1.GetCov().at<float>(0, 1));
@@ -424,6 +446,7 @@ int main()
 							clase2.GetMean().at<float>(0, 0), clase2.GetMean().at<float>(1, 0),
 							clase2.GetCov().at<float>(0, 0), clase2.GetCov().at<float>(1, 1), clase2.GetCov().at<float>(0, 1));
 
+						// If the pixel is closer to calss 1 it belongs to it, if not it belongs to class 2.
 						if (d1 <= d2)
 						{
 							if (classes.at<uchar>(i, j) != clase1.GetTag())
@@ -444,8 +467,10 @@ int main()
 				}
 			}
 
+			// Check if a pixel changed class.
 			if (changes)
 			{
+				// Loop that updates the mask to work only with correspinding pixels on the image.
 				mMask = Mat::zeros(fFrame.size(), CV_8UC1);
 				for (int i = 0; i < classes.rows; i++)
 				{
@@ -457,13 +482,15 @@ int main()
 						}
 					}
 				}
+
+				// Check if pixels corresponding to current class 1 have covariance different to cero.
 				MeanCov(labFrame, mMask, Mean, Cov);
 				if (countNonZero(Cov) < 1)
 				{
 					covClass1AllCero = true;
 					if (countNonZero(Mean) < 1)
 					{
-						std::cout << "detener" << endl << endl;
+						std::cout << "stop!" << endl << endl;
 					}
 				}
 				std::cout << Mean << endl << endl;
@@ -471,6 +498,7 @@ int main()
 				clase1.SetMean(Mean.clone());
 				clase1.SetCov(Cov.clone());
 
+				// Loop that updates the mask to work only with correspinding pixels on the image.
 				mMask = Mat::zeros(fFrame.size(), CV_8UC1);
 				for (int i = 0; i < classes.rows; i++)
 				{
@@ -482,13 +510,15 @@ int main()
 						}
 					}
 				}
+
+				// Check if pixels corresponding to current class 2 have covariance different to cero.
 				MeanCov(labFrame, mMask, Mean, Cov);
 				if (countNonZero(Cov) < 1)
 				{
 					covClasss2AllCero = true;
 					if (countNonZero(Mean) < 1)
 					{
-						std::cout << "detener" << endl << endl;
+						std::cout << "stop!" << endl << endl;
 					}
 				}
 				std::cout << Mean << endl << endl;
@@ -503,8 +533,10 @@ int main()
 			}
 		}
 
+		// When all pixels have been put into a class and there are no more changes to make we say we are finished.
 		if (!finish)
 		{
+			// If classes have cov cero we remomve those clasess so they do not endure.
 			if (covClass1AllCero && covClasss2AllCero)
 			{
 				for (size_t i = 0; i < listClassesEndures.size(); i++)
@@ -519,6 +551,7 @@ int main()
 				covClasss2AllCero = false;
 			}
 
+			// Check if current class 1 or 2 endure, and then set this tag as parent tag.
 			if (!classEndures(classes, clase1.GetTag()) || !classEndures(classes, clase2.GetTag()))
 			{
 				int etiquetaPadre = -1;
@@ -545,6 +578,7 @@ int main()
 					}
 				}
 
+				// Remove current class 1 and 2 tags from listClassesEndures, also remove parent tag.
 				for (size_t i = 0; i < listClassesEndures.size(); i++)
 				{
 					if (listClassesEndures.at(i).GetTag() == clase1.GetTag() || listClassesEndures.at(i).GetTag() == clase2.GetTag() || listClassesEndures.at(i).GetTag() == etiquetaPadre)
@@ -561,9 +595,10 @@ int main()
 			}
 		}
 
-		/*********************************************************************************************************************************/
+		// If there are new tags we continue.
 		if (newTags.size() == 0 && !finish)
 		{
+			// Remove any class that could be in listClassesEndures but does not endure.
 			for (int i = 0; i < listClassesEndures.size(); i++)
 			{
 				if (!classEndures(classes, listClassesEndures.at(i).GetTag()))
@@ -604,6 +639,7 @@ int main()
 			BGRFrame.convertTo(exitFrame, CV_8UC3);
 			imgList.push_back(exitFrame);
 
+			// If not finished create new tags to continue.
 			if (!finish)
 			{
 				amountTagsCreate = listClassesEndures.size() * 2;
@@ -616,12 +652,13 @@ int main()
 
 				tempNewTags = newTags;
 
+				// Assign two child classes to all classes that endure.
 				for (int i = 0; i < listClassesEndures.size(); i++)
 				{
-					int primerHijo = tempNewTags.front();
+					int firstChild = tempNewTags.front();
 					tempNewTags.erase(tempNewTags.begin());
 
-					int segundoHijo = tempNewTags.front();
+					int secondChild = tempNewTags.front();
 					tempNewTags.erase(tempNewTags.begin());
 
 					bool alternate = true;
@@ -634,12 +671,12 @@ int main()
 							{
 								if (alternate)
 								{
-									classes.at<uchar>(j, k) = primerHijo;
+									classes.at<uchar>(j, k) = firstChild;
 									alternate = !alternate;
 								}
 								else
 								{
-									classes.at<uchar>(j, k) = segundoHijo;
+									classes.at<uchar>(j, k) = secondChild;
 								}
 							}
 						}
@@ -653,6 +690,7 @@ int main()
 
 	countClasses(listClasses, classes);
 
+	// Show resulting images.
 	for (int i = 0; i < imgList.size(); i++)
 	{
 		ostringstream cadena;
