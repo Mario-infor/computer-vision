@@ -174,11 +174,11 @@ int MeanCov(Mat& image, Mat& Mask, Mat& mean, Mat& cov)
 
 bool classEndures(Mat classes, int findTag)
 {
-	for (int i = 0; i < clases.rows; i++)
+	for (int i = 0; i < classes.rows; i++)
 	{
-		for (int j = 0; j < clases.cols; j++)
+		for (int j = 0; j < classes.cols; j++)
 		{
-			if (clases.at<uchar>(i, j) == etiquetaBuscar)
+			if (classes.at<uchar>(i, j) == findTag)
 			{
 				return true;
 			}
@@ -187,27 +187,27 @@ bool classEndures(Mat classes, int findTag)
 	return false;
 }
 
-void contarClases(vector<Class>& listaClases, Mat matrizClases)
+void countClasses(vector<Class>& classesList, Mat classesMatrix)
 {
-	for (size_t i = 0; i < matrizClases.rows; i++)
+	for (size_t i = 0; i < classesMatrix.rows; i++)
 	{
-		for (size_t j = 0; j < matrizClases.cols; j++)
+		for (size_t j = 0; j < classesMatrix.cols; j++)
 		{
-			int etiqueta = matrizClases.at<uchar>(i, j);
+			int tag = classesMatrix.at<uchar>(i, j);
 
-			for (size_t k = 0; k < listaClases.size(); k++)
+			for (size_t k = 0; k < classesList.size(); k++)
 			{
-				if (listaClases.at(k).GetTag() == etiqueta)
+				if (classesList.at(k).GetTag() == tag)
 				{
-					listaClases.at(k).SetAmount(listaClases.at(k).GetAmount() + 1);
+					classesList.at(k).SetAmount(classesList.at(k).GetAmount() + 1);
 				}
 			}
 		}
 	}
 
-	for (size_t i = 0; i < listaClases.size(); i++)
+	for (size_t i = 0; i < classesList.size(); i++)
 	{
-		std::cout << "Clase " << to_string(listaClases.at(i).GetTag()) << ": " << to_string(listaClases.at(i).GetAmount()) << endl;
+		std::cout << "Class " << to_string(classesList.at(i).GetTag()) << ": " << to_string(classesList.at(i).GetAmount()) << endl;
 	}
 }
 
@@ -216,55 +216,55 @@ void contarClases(vector<Class>& listaClases, Mat matrizClases)
 int main()
 {
 	Mat frame, fFrame, mMask, labFrame;
-	Mat Mean, frameAnterior, Cov, M, clases;
+	Mat Mean, lastFrame, Cov, M, classes;
 	Mat MeanOriginal, CovOriginal;
-	int identificadorEtiqueta = 0;
-	int cantEtiquetasCrear = 2;
-	bool terminar = false;
-	bool covClase1TodoCero = false;
-	bool covClase2TodoCero = false;
-	vector<Class> listaClases;
-	vector<Class> listaClasesPerduran;
-	vector<int> etiquetasActuales;
-	vector<int> etiquetasNuevas;
-	vector<int> tempEtiquetasNuevas;
-	vector<Mat> listaImagenes;
-	vector<Mat> listaMatClases;
+	int tagId = 0;
+	int amountTagsCreate = 2;
+	bool finish = false;
+	bool covClass1AllCero = false;
+	bool covClasss2AllCero = false;
+	vector<Class> listClasses;
+	vector<Class> listClassesEndures;
+	vector<int> currentTags;
+	vector<int> newTags;
+	vector<int> tempNewTags;
+	vector<Mat> imgList;
+	vector<Mat> listMatClasses;
 	frame = imread("Img/Jaguar2.png", 1);
 
 	frame.convertTo(fFrame, CV_32FC3);
 	fFrame /= 255;
-	cvtColor(fFrame, labFrame, COLOR_BGR2Lab);
-	clases = Mat::ones(fFrame.size(), CV_8UC1);
+	cv::cvtColor(fFrame, labFrame, COLOR_BGR2Lab);
+	classes = Mat::ones(fFrame.size(), CV_8UC1);
 
-	for (int i = 0; i < clases.rows; i++)
+	for (int i = 0; i < classes.rows; i++)
 	{
-		for (int j = 0; j < clases.cols; j++)
+		for (int j = 0; j < classes.cols; j++)
 		{
-			clases.at<uchar>(i, j) = 1 + rand() % 2;
+			classes.at<uchar>(i, j) = 1 + rand() % 2;
 		}
 	}
 
-	identificadorEtiqueta += 1;
-	etiquetasNuevas.push_back(identificadorEtiqueta);
-	identificadorEtiqueta += 1;
-	etiquetasNuevas.push_back(identificadorEtiqueta);
+	tagId += 1;
+	newTags.push_back(tagId);
+	tagId += 1;
+	newTags.push_back(tagId);
 
 	/*******************************************************************************************/
-	while (etiquetasNuevas.size() > 0 && !terminar)
+	while (newTags.size() > 0 && !finish)
 	{
-		etiquetasActuales.clear();
-		etiquetasActuales.push_back(etiquetasNuevas.front());
-		etiquetasNuevas.erase(etiquetasNuevas.begin());
-		etiquetasActuales.push_back(etiquetasNuevas.front());
-		etiquetasNuevas.erase(etiquetasNuevas.begin());
+		currentTags.clear();
+		currentTags.push_back(newTags.front());
+		newTags.erase(newTags.begin());
+		currentTags.push_back(newTags.front());
+		newTags.erase(newTags.begin());
 
 		mMask = Mat::zeros(fFrame.size(), CV_8UC1);
-		for (int i = 0; i < clases.rows; i++)
+		for (int i = 0; i < classes.rows; i++)
 		{
-			for (int j = 0; j < clases.cols; j++)
+			for (int j = 0; j < classes.cols; j++)
 			{
-				if (clases.at<uchar>(i, j) == etiquetasActuales[0])
+				if (classes.at<uchar>(i, j) == currentTags[0])
 				{
 					mMask.at<uchar>(i, j) = 1;
 				}
@@ -273,22 +273,22 @@ int main()
 		MeanCov(labFrame, mMask, Mean, Cov);
 		if (countNonZero(Cov) < 1)
 		{
-			covClase1TodoCero = true;
-			terminar = true;
+			covClass1AllCero = true;
+			finish = true;
 		}
 		std::cout << Mean << endl << endl;
 		std::cout << Cov << endl << endl;
-		Class clase1(etiquetasActuales[0], Mean.clone(), Cov.clone());
-		listaClases.push_back(clase1);
-		listaClasesPerduran.push_back(clase1);
+		Class clase1(currentTags[0], Mean.clone(), Cov.clone());
+		listClasses.push_back(clase1);
+		listClassesEndures.push_back(clase1);
 
 
 		mMask = Mat::zeros(fFrame.size(), CV_8UC1);
-		for (int i = 0; i < clases.rows; i++)
+		for (int i = 0; i < classes.rows; i++)
 		{
-			for (int j = 0; j < clases.cols; j++)
+			for (int j = 0; j < classes.cols; j++)
 			{
-				if (clases.at<uchar>(i, j) == etiquetasActuales[1])
+				if (classes.at<uchar>(i, j) == currentTags[1])
 				{
 					mMask.at<uchar>(i, j) = 1;
 				}
@@ -297,23 +297,23 @@ int main()
 		MeanCov(labFrame, mMask, Mean, Cov);
 		if (countNonZero(Cov) < 1)
 		{
-			covClase2TodoCero = true;
-			terminar = true;
+			covClasss2AllCero = true;
+			finish = true;
 		}
 		std::cout << Mean << endl << endl;
 		std::cout << Cov << endl << endl;
-		Class clase2(etiquetasActuales[1], Mean.clone(), Cov.clone());
-		listaClases.push_back(clase2);
-		listaClasesPerduran.push_back(clase2);
+		Class clase2(currentTags[1], Mean.clone(), Cov.clone());
+		listClasses.push_back(clase2);
+		listClassesEndures.push_back(clase2);
 
-		bool huboCambio = false;
-		while (!huboCambio && !covClase1TodoCero && !covClase2TodoCero)
+		bool changes = false;
+		while (!changes && !covClass1AllCero && !covClasss2AllCero)
 		{
 			for (int i = 0; i < labFrame.rows; i++)
 			{
 				for (int j = 0; j < labFrame.cols; j++)
 				{
-					if (clases.at<uchar>(i, j) == clase1.GetTag() || clases.at<uchar>(i, j) == clase2.GetTag())
+					if (classes.at<uchar>(i, j) == clase1.GetTag() || classes.at<uchar>(i, j) == clase2.GetTag())
 					{
 						double d1 = dEuclidean(labFrame.at<Vec3f>(i, j)[1], labFrame.at<Vec3f>(i, j)[2],
 							clase1.GetMean().at<float>(0, 0), clase1.GetMean().at<float>(1, 0),
@@ -325,18 +325,18 @@ int main()
 
 						if (d1 <= d2)
 						{
-							if (clases.at<uchar>(i, j) != clase1.GetTag())
+							if (classes.at<uchar>(i, j) != clase1.GetTag())
 							{
-								huboCambio = true;
-								clases.at<uchar>(i, j) = clase1.GetTag();
+								changes = true;
+								classes.at<uchar>(i, j) = clase1.GetTag();
 							}
 						}
 						else
 						{
-							if (clases.at<uchar>(i, j) != clase2.GetTag())
+							if (classes.at<uchar>(i, j) != clase2.GetTag())
 							{
-								huboCambio = true;
-								clases.at<uchar>(i, j) = clase2.GetTag();
+								changes = true;
+								classes.at<uchar>(i, j) = clase2.GetTag();
 							}
 						}
 					}
@@ -344,14 +344,14 @@ int main()
 				}
 			}
 
-			if (huboCambio)
+			if (changes)
 			{
 				mMask = Mat::zeros(fFrame.size(), CV_8UC1);
-				for (int i = 0; i < clases.rows; i++)
+				for (int i = 0; i < classes.rows; i++)
 				{
-					for (int j = 0; j < clases.cols; j++)
+					for (int j = 0; j < classes.cols; j++)
 					{
-						if (clases.at<uchar>(i, j) == clase1.GetTag())
+						if (classes.at<uchar>(i, j) == clase1.GetTag())
 						{
 							mMask.at<uchar>(i, j) = 1;
 						}
@@ -360,7 +360,7 @@ int main()
 				MeanCov(labFrame, mMask, Mean, Cov);
 				if (countNonZero(Cov) < 1)
 				{
-					covClase1TodoCero = true;
+					covClass1AllCero = true;
 					if (countNonZero(Mean) < 1)
 					{
 						std::cout << "detener" << endl << endl;
@@ -372,11 +372,11 @@ int main()
 				clase1.SetCov(Cov.clone());
 
 				mMask = Mat::zeros(fFrame.size(), CV_8UC1);
-				for (int i = 0; i < clases.rows; i++)
+				for (int i = 0; i < classes.rows; i++)
 				{
-					for (int j = 0; j < clases.cols; j++)
+					for (int j = 0; j < classes.cols; j++)
 					{
-						if (clases.at<uchar>(i, j) == clase2.GetTag())
+						if (classes.at<uchar>(i, j) == clase2.GetTag())
 						{
 							mMask.at<uchar>(i, j) = 1;
 						}
@@ -385,7 +385,7 @@ int main()
 				MeanCov(labFrame, mMask, Mean, Cov);
 				if (countNonZero(Cov) < 1)
 				{
-					covClase2TodoCero = true;
+					covClasss2AllCero = true;
 					if (countNonZero(Mean) < 1)
 					{
 						std::cout << "detener" << endl << endl;
@@ -395,22 +395,22 @@ int main()
 				std::cout << Cov << endl << endl;
 				clase2.SetMean(Mean.clone());
 				clase2.SetCov(Cov.clone());
-				huboCambio = false;
+				changes = false;
 			}
 			else
 			{
-				huboCambio = true;
+				changes = true;
 			}
 		}
 
-		huboCambio = false;
-		while (!huboCambio && !covClase1TodoCero && !covClase2TodoCero)
+		changes = false;
+		while (!changes && !covClass1AllCero && !covClasss2AllCero)
 		{
 			for (int i = 0; i < labFrame.rows; i++)
 			{
 				for (int j = 0; j < labFrame.cols; j++)
 				{
-					if (clases.at<uchar>(i, j) == clase1.GetTag() || clases.at<uchar>(i, j) == clase2.GetTag())
+					if (classes.at<uchar>(i, j) == clase1.GetTag() || classes.at<uchar>(i, j) == clase2.GetTag())
 					{
 						double d1 = dMahalanobisN(labFrame.at<Vec3f>(i, j)[1], labFrame.at<Vec3f>(i, j)[2],
 							clase1.GetMean().at<float>(0, 0), clase1.GetMean().at<float>(1, 0),
@@ -422,32 +422,32 @@ int main()
 
 						if (d1 <= d2)
 						{
-							if (clases.at<uchar>(i, j) != clase1.GetTag())
+							if (classes.at<uchar>(i, j) != clase1.GetTag())
 							{
-								huboCambio = true;
-								clases.at<uchar>(i, j) = clase1.GetTag();
+								changes = true;
+								classes.at<uchar>(i, j) = clase1.GetTag();
 							}
 						}
 						else
 						{
-							if (clases.at<uchar>(i, j) != clase2.GetTag())
+							if (classes.at<uchar>(i, j) != clase2.GetTag())
 							{
-								huboCambio = true;
-								clases.at<uchar>(i, j) = clase2.GetTag();
+								changes = true;
+								classes.at<uchar>(i, j) = clase2.GetTag();
 							}
 						}
 					}
 				}
 			}
 
-			if (huboCambio)
+			if (changes)
 			{
 				mMask = Mat::zeros(fFrame.size(), CV_8UC1);
-				for (int i = 0; i < clases.rows; i++)
+				for (int i = 0; i < classes.rows; i++)
 				{
-					for (int j = 0; j < clases.cols; j++)
+					for (int j = 0; j < classes.cols; j++)
 					{
-						if (clases.at<uchar>(i, j) == clase1.GetTag())
+						if (classes.at<uchar>(i, j) == clase1.GetTag())
 						{
 							mMask.at<uchar>(i, j) = 1;
 						}
@@ -456,7 +456,7 @@ int main()
 				MeanCov(labFrame, mMask, Mean, Cov);
 				if (countNonZero(Cov) < 1)
 				{
-					covClase1TodoCero = true;
+					covClass1AllCero = true;
 					if (countNonZero(Mean) < 1)
 					{
 						std::cout << "detener" << endl << endl;
@@ -468,11 +468,11 @@ int main()
 				clase1.SetCov(Cov.clone());
 
 				mMask = Mat::zeros(fFrame.size(), CV_8UC1);
-				for (int i = 0; i < clases.rows; i++)
+				for (int i = 0; i < classes.rows; i++)
 				{
-					for (int j = 0; j < clases.cols; j++)
+					for (int j = 0; j < classes.cols; j++)
 					{
-						if (clases.at<uchar>(i, j) == clase2.GetTag())
+						if (classes.at<uchar>(i, j) == clase2.GetTag())
 						{
 							mMask.at<uchar>(i, j) = 1;
 						}
@@ -481,7 +481,7 @@ int main()
 				MeanCov(labFrame, mMask, Mean, Cov);
 				if (countNonZero(Cov) < 1)
 				{
-					covClase2TodoCero = true;
+					covClasss2AllCero = true;
 					if (countNonZero(Mean) < 1)
 					{
 						std::cout << "detener" << endl << endl;
@@ -491,103 +491,103 @@ int main()
 				std::cout << Cov << endl << endl;
 				clase2.SetMean(Mean.clone());
 				clase2.SetCov(Cov.clone());
-				huboCambio = false;
+				changes = false;
 			}
 			else
 			{
-				huboCambio = true;
+				changes = true;
 			}
 		}
 
-		if (!terminar)
+		if (!finish)
 		{
-			if (covClase1TodoCero && covClase2TodoCero)
+			if (covClass1AllCero && covClasss2AllCero)
 			{
-				for (size_t i = 0; i < listaClasesPerduran.size(); i++)
+				for (size_t i = 0; i < listClassesEndures.size(); i++)
 				{
-					if (listaClasesPerduran.at(i).GetTag() == clase1.GetTag() || listaClasesPerduran.at(i).GetTag() == clase2.GetTag())
+					if (listClassesEndures.at(i).GetTag() == clase1.GetTag() || listClassesEndures.at(i).GetTag() == clase2.GetTag())
 					{
-						listaClasesPerduran.erase(listaClasesPerduran.begin() + i);
+						listClassesEndures.erase(listClassesEndures.begin() + i);
 						i--;
 					}
 				}
-				covClase1TodoCero = false;
-				covClase2TodoCero = false;
+				covClass1AllCero = false;
+				covClasss2AllCero = false;
 			}
 
-			if (!clasePerdura(clases, clase1.GetTag()) || !clasePerdura(clases, clase2.GetTag()))
+			if (!classEndures(classes, clase1.GetTag()) || !classEndures(classes, clase2.GetTag()))
 			{
 				int etiquetaPadre = -1;
 
-				for (int i = 0; i < clases.rows; i++)
+				for (int i = 0; i < classes.rows; i++)
 				{
-					for (int j = 0; j < clases.cols; j++)
+					for (int j = 0; j < classes.cols; j++)
 					{
-						if (clases.at<uchar>(i, j) == clase1.GetTag() || clases.at<uchar>(i, j) == clase2.GetTag())
+						if (classes.at<uchar>(i, j) == clase1.GetTag() || classes.at<uchar>(i, j) == clase2.GetTag())
 						{
 							if (etiquetaPadre == -1)
 							{
-								if (listaMatClases.size() == 0)
+								if (listMatClasses.size() == 0)
 								{
 									etiquetaPadre = clase1.GetTag();
 								}
 								else
 								{
-									etiquetaPadre = listaMatClases.at(listaMatClases.size() - 1).at<uchar>(i, j);
+									etiquetaPadre = listMatClasses.at(listMatClasses.size() - 1).at<uchar>(i, j);
 								}
 							}
-							clases.at<uchar>(i, j) = etiquetaPadre; 
+							classes.at<uchar>(i, j) = etiquetaPadre;
 						}
 					}
 				}
 
-				for (size_t i = 0; i < listaClasesPerduran.size(); i++)
+				for (size_t i = 0; i < listClassesEndures.size(); i++)
 				{
-					if (listaClasesPerduran.at(i).GetTag() == clase1.GetTag() || listaClasesPerduran.at(i).GetTag() == clase2.GetTag() || listaClasesPerduran.at(i).GetTag() == etiquetaPadre)
+					if (listClassesEndures.at(i).GetTag() == clase1.GetTag() || listClassesEndures.at(i).GetTag() == clase2.GetTag() || listClassesEndures.at(i).GetTag() == etiquetaPadre)
 					{
-						listaClasesPerduran.erase(listaClasesPerduran.begin() + i);
+						listClassesEndures.erase(listClassesEndures.begin() + i);
 						i--;
 					}
 				}
 
-				if (listaClasesPerduran.size() == 0)
+				if (listClassesEndures.size() == 0)
 				{
-					terminar = true;
+					finish = true;
 				}
 			}
 		}
 
 		/*********************************************************************************************************************************/
-		if (etiquetasNuevas.size() == 0 && !terminar)
+		if (newTags.size() == 0 && !finish)
 		{
-			for (int i = 0; i < listaClasesPerduran.size(); i++)
+			for (int i = 0; i < listClassesEndures.size(); i++)
 			{
-				if (!clasePerdura(clases, listaClasesPerduran.at(i).GetTag()))
+				if (!classEndures(classes, listClassesEndures.at(i).GetTag()))
 				{
-					listaClasesPerduran.erase(listaClasesPerduran.begin() + i);
+					listClassesEndures.erase(listClassesEndures.begin() + i);
 					i--;
 				}
 
-				if (listaClasesPerduran.size() == 0)
+				if (listClassesEndures.size() == 0)
 				{
-					terminar = true;
+					finish = true;
 				}
 			}
 
-			listaMatClases.push_back(clases.clone());
+			listMatClasses.push_back(classes.clone());
 			Mat labFrameCopy = labFrame.clone();
 
-			for (int i = 0; i < clases.rows; i++)
+			for (int i = 0; i < classes.rows; i++)
 			{
-				for (int j = 0; j < clases.cols; j++)
+				for (int j = 0; j < classes.cols; j++)
 				{
-					int tempEtiqueta = clases.at<uchar>(i, j);
-					for (int k = 0; k < listaClases.size(); k++)
+					int tempEtiqueta = classes.at<uchar>(i, j);
+					for (int k = 0; k < listClasses.size(); k++)
 					{
-						if (listaClases.at(k).GetTag() == tempEtiqueta)
+						if (listClasses.at(k).GetTag() == tempEtiqueta)
 						{
-							labFrameCopy.at<Vec3f>(i, j)[1] = listaClases.at(k).GetMean().at<float>(0, 0);
-							labFrameCopy.at<Vec3f>(i, j)[2] = listaClases.at(k).GetMean().at<float>(1, 0);
+							labFrameCopy.at<Vec3f>(i, j)[1] = listClasses.at(k).GetMean().at<float>(0, 0);
+							labFrameCopy.at<Vec3f>(i, j)[2] = listClasses.at(k).GetMean().at<float>(1, 0);
 						}
 					}
 				}
@@ -595,47 +595,47 @@ int main()
 
 			Mat BGRFrame;
 			Mat exitFrame;
-			cvtColor(labFrameCopy, BGRFrame, COLOR_Lab2BGR);
+			cv::cvtColor(labFrameCopy, BGRFrame, COLOR_Lab2BGR);
 			BGRFrame *= 255;
 			BGRFrame.convertTo(exitFrame, CV_8UC3);
-			listaImagenes.push_back(exitFrame);
+			imgList.push_back(exitFrame);
 
-			if (!terminar)
+			if (!finish)
 			{
-				cantEtiquetasCrear = listaClasesPerduran.size() * 2;
+				amountTagsCreate = listClassesEndures.size() * 2;
 
-				for (int i = 0; i < cantEtiquetasCrear; i++)
+				for (int i = 0; i < amountTagsCreate; i++)
 				{
-					identificadorEtiqueta += 1;
-					etiquetasNuevas.push_back(identificadorEtiqueta);
+					tagId += 1;
+					newTags.push_back(tagId);
 				}
 
-				tempEtiquetasNuevas = etiquetasNuevas;
+				tempNewTags = newTags;
 
-				for (int i = 0; i < listaClasesPerduran.size(); i++)
+				for (int i = 0; i < listClassesEndures.size(); i++)
 				{
-					int primerHijo = tempEtiquetasNuevas.front();
-					tempEtiquetasNuevas.erase(tempEtiquetasNuevas.begin());
+					int primerHijo = tempNewTags.front();
+					tempNewTags.erase(tempNewTags.begin());
 
-					int segundoHijo = tempEtiquetasNuevas.front();
-					tempEtiquetasNuevas.erase(tempEtiquetasNuevas.begin());
+					int segundoHijo = tempNewTags.front();
+					tempNewTags.erase(tempNewTags.begin());
 
-					bool alternar = true;
+					bool alternate = true;
 
-					for (int j = 0; j < clases.rows; j++)
+					for (int j = 0; j < classes.rows; j++)
 					{
-						for (int k = 0; k < clases.cols; k++)
+						for (int k = 0; k < classes.cols; k++)
 						{
-							if (clases.at<uchar>(j, k) == listaClasesPerduran.at(i).GetTag())
+							if (classes.at<uchar>(j, k) == listClassesEndures.at(i).GetTag())
 							{
-								if (alternar)
+								if (alternate)
 								{
-									clases.at<uchar>(j, k) = primerHijo;
-									alternar = !alternar;
+									classes.at<uchar>(j, k) = primerHijo;
+									alternate = !alternate;
 								}
 								else
 								{
-									clases.at<uchar>(j, k) = segundoHijo;
+									classes.at<uchar>(j, k) = segundoHijo;
 								}
 							}
 						}
@@ -643,17 +643,17 @@ int main()
 				}
 			}
 		}
-		covClase1TodoCero = false;
-		covClase2TodoCero = false;
+		covClass1AllCero = false;
+		covClasss2AllCero = false;
 	}
 
-	contarClases(listaClases, clases);
+	countClasses(listClasses, classes);
 
-	for (int i = 0; i < listaImagenes.size(); i++)
+	for (int i = 0; i < imgList.size(); i++)
 	{
 		ostringstream cadena;
-		cadena << "Iteracion " << i << " :";
-		imshow(cadena.str(), listaImagenes.at(i));
+		cadena << "Ite " << i << " :";
+		imshow(cadena.str(), imgList.at(i));
 		waitKey(0);
 	}
 
